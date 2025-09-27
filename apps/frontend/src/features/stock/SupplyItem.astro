@@ -1,0 +1,41 @@
+---
+// Importamos las propiedades del componente.
+// Ahora recibimos las propiedades de un 'Insumo'.
+const { id, name, quantity, minimum_stock, supplier } = Astro.props;
+
+// Importamos el componente de iconos.
+import { Icon } from 'astro-icon/components';
+---
+
+<li class="bg-white p-6 rounded-lg shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+  <div class="flex-1 min-w-0">
+    <input type="text" name="name" class="text-lg font-bold supply-name-input" value="Esencia de Lavanda" readonly>
+    <div class="flex flex-col mt-2">
+    </div>
+  </div>
+  <div class="flex items-center gap-4 text-sm font-medium flex-wrap">
+    <div class="flex flex-col items-center">
+      <p class="text-[var(--text-secondary)]">Cantidad</p>
+      <input type="number" name="quantity" class="supply-quantity-input w-16 text-center p-1 rounded-md bg-gray-100" value="100" readonly>
+    </div>
+    <div class="flex flex-col items-center">
+      <p class="text-[var(--text-secondary)]">Stock Mínimo</p>
+      <input type="number" name="minimum_stock" class="supply-min-stock-input w-16 text-center p-1 rounded-md bg-gray-100" value="20" readonly>
+    </div>
+    <div class="flex flex-col items-center">
+      <p class="text-[var(--text-secondary)]">Proveedor</p>
+      <input type="text" name="supplier" class="supply-supplier-input w-24 text-center p-1 rounded-md bg-gray-100" value="P&G" readonly>
+    </div>
+  </div>
+  <div class="flex gap-2 flex-shrink-0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@6.5.95/css/materialdesignicons.min.css">
+    <button aria-label="Editar" class="flex items-center justify-center rounded-full size-10 text-[var(--text-secondary)] hover:text-[var(--button-color)] transition-colors edit-btn">
+      <span class="mdi mdi-table-edit text-2xl"></span>
+    </button>
+    <button aria-label="Eliminar" class="flex items-center justify-center rounded-full size-10 text-[var(--text-secondary)] hover:text-red-600 transition-colors delete-btn">
+      <span class="mdi mdi-trash-can-outline text-2xl"></span>
+    </button>
+  </div>
+</li>
+
+

@@ -1,0 +1,108 @@
+---
+// Define las props que este componente de tarjeta espera recibir.
+// Estas propiedades serán los datos de un solo producto.
+const { name, description, price, price_bs, image } = Astro.props;
+---
+
+<div class="product-card bg-white rounded-lg shadow-md overflow-hidden flex flex-col items-center p-4 text-center">
+    <!-- Usa la URL de la imagen del producto, con un fallback si no está disponible -->
+    <img src={image || "https://via.placeholder.com/200"} alt={name} class="w-full h-48 object-cover rounded-md mb-4" />
+    
+    <!-- Muestra el nombre del producto -->
+    <h3 class="product-name text-lg font-bold text-[var(--text-primary)]">{name}</h3>
+    
+    <!-- Muestra la descripción del producto -->
+    <p class="product-description text-sm text-[var(--text-secondary)] mt-1">
+        {description}
+    </p>
+    
+    <!-- Muestra los precios en USD y bolívares -->
+    <p class="product-price text-sm text-[var(--text-secondary)] mt-2">
+        <span class="price-usd font-semibold text-lg text-[var(--button-color)]">${price}</span>
+        <br />
+        <span class="price-bs text-xs text-gray-500">Bs. {price_bs}</span>
+    </p>
+    
+    <!-- Botón para agregar al carrito -->
+    <button class="add-to-cart-btn mt-4 w-full flex items-center justify-center rounded-md text-sm font-medium transition-colors h-10 px-4 py-2 bg-[var(--primary-color)] hover:bg-[var(--button-color)] text-black">
+        <span class="mdi mdi-cart-outline mr-2"></span>
+        Agregar al carrito
+    </button>
+
+        <!-- El formulario, oculto por defecto -->
+    <div class="invoice-form mt-6 w-full hidden">
+        <h4 class="text-sm font-bold text-gray-700 mb-3">Para comenzar su factura, ingrese:</h4>
+        <form class="space-y-4">
+            <div>
+                <label for="client-name-{id}" class="sr-only">Nombre</label>
+                <input id="client-name-{id}" name="client_name" type="text" placeholder="Nombre" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+            </div>
+            <div>
+                <label for="phone-number-{id}" class="sr-only">Número de teléfono</label>
+                <input id="phone-number-{id}" name="client_phone_number" type="tel" placeholder="Número de teléfono" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+            </div>
+            <div>
+                <label for="status-{id}" class="sr-only">Estado</label>
+                <input id="status-{id}" name="status" type="text" value="pendiente" readonly class="bg-gray-200 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+            </div>
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full">
+                Enviar
+            </button>
+        </form>
+    </div>
+
+</div>
+
+<script>
+// @ts-nocheck
+    // Importa la función addInvoice directamente de tu módulo
+    import { addInvoice } from "./invoice.module.js"; 
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const buttons = document.querySelectorAll('.add-to-cart-btn');
+
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                const card = button.closest('.product-card');
+                if (card) {
+                    const form = card.querySelector('.invoice-form');
+                    if (form) {
+                        form.classList.toggle('hidden');
+                    }
+                }
+            });
+        });
+
+        // Maneja el envío de cada formulario
+        const forms = document.querySelectorAll('.invoice-form form');
+        forms.forEach(form => {
+            if (form) {
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+
+                    const formData = new FormData(e.target);
+                    const invoiceToCreate = {
+                        client_name: formData.get('client_name'),
+                        client_phone_number: formData.get('client_phone_number'),
+                        status: 'pendiente',
+                        // Agrega el product_id si lo pasas con un data-atributo
+                    };
+
+                    try {
+                        // Llama a la función asíncrona correctamente
+                        await addInvoice(invoiceToCreate);
+                        
+                        const formContainer = e.target.closest('.invoice-form');
+                        if (formContainer) {
+                            formContainer.classList.add('hidden');
+                            e.target.reset();
+                        }
+                    } catch (error) {
+                        console.error("Error al enviar la factura:", error);
+                    }
+                });
+            }
+        });
+    });
+
+</script>

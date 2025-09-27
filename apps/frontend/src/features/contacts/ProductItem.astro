@@ -1,0 +1,50 @@
+---
+// Importamos las propiedades del componente.
+// Ahora recibimos las propiedades de un 'Producto'.
+const { id, name, description, price, price_bs, quantity, minimum_stock, image, manufacturer } = Astro.props;
+
+// Importamos el componente de iconos.
+import { Icon } from 'astro-icon/components';
+---
+
+<li class="bg-white p-6 rounded-lg shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+  <img src="https://via.placeholder.com/64" alt="Imagen del producto" class="w-16 h-16 rounded-md object-cover flex-shrink-0">
+  <div class="flex-1 min-w-0">
+    <input type="text" name="name" class="text-lg font-bold product-name-input" value="Limpiador Multiusos" readonly>
+    <div class="flex flex-col mt-2">
+      <p class="text-sm text-[var(--text-secondary)]">Descripción</p>
+      <input type="text" name="description" class="text-sm text-[var(--text-secondary)] product-description-input w-full p-1 rounded-md bg-gray-100" value="Limpia cualquier superficie y deja un aroma a lavanda." readonly>
+    </div>
+  </div>
+  <div class="flex items-center gap-4 text-sm font-medium flex-wrap">
+    <div class="flex flex-col items-center">
+      <p class="text-[var(--text-secondary)]">Precio</p>
+      <input type="text" name="price" class="product-price-input w-20 text-center p-1 rounded-md bg-gray-100" value="$5.99" readonly>
+    </div>
+    <div class="flex flex-col items-center">
+      <p class="text-[var(--text-secondary)]">Precio (Bs)</p>
+      <input type="text" name="price_bs" class="product-price-bs-input w-24 text-center p-1 rounded-md bg-gray-100" value="Bs. 218.42" readonly>
+    </div>
+    <div class="flex flex-col items-center">
+      <p class="text-[var(--text-secondary)]">Cantidad</p>
+      <input type="number" name="quantity" class="product-quantity-input w-16 text-center p-1 rounded-md bg-gray-100" value="100" readonly>
+    </div>
+    <div class="flex flex-col items-center">
+      <p class="text-[var(--text-secondary)]">Stock Mínimo</p>
+      <input type="number" name="minimum_stock" class="product-min-stock-input w-16 text-center p-1 rounded-md bg-gray-100" value="20" readonly>
+    </div>
+    <div class="flex flex-col items-center">
+      <p class="text-[var(--text-secondary)]">Fabricante</p>
+      <input type="text" name="manufacturer" class="product-manufacturer-input w-24 text-center p-1 rounded-md bg-gray-100" value="P&G" readonly>
+    </div>
+  </div>
+  <div class="flex gap-2 flex-shrink-0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@6.5.95/css/materialdesignicons.min.css">
+    <button aria-label="Editar" class="flex items-center justify-center rounded-full size-10 text-[var(--text-secondary)] hover:text-[var(--button-color)] transition-colors edit-btn">
+      <span class="mdi mdi-table-edit text-2xl"></span>
+    </button>
+    <button aria-label="Eliminar" class="flex items-center justify-center rounded-full size-10 text-[var(--text-secondary)] hover:text-red-600 transition-colors delete-btn">
+      <span class="mdi mdi-trash-can-outline text-2xl"></span>
+    </button>
+  </div>
+</li>

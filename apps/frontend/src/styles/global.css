@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+/* Variables de color */
+:root {
+	--primary-color: #35e6ec;
+	--secondary-color: #e6f0f5;
+	--text-primary: #111518;
+	--text-secondary: #637c88;
+	--border-color: #dce2e5;
+	--button-color: #ec7717;
+	--menu-color: #ccf9ff;
+}
+
+/* Estilos para el menú overlay */
+#menu-lateral {
+	transition: transform 0.3s ease-in-out;
+	transform: translateX(-100%);
+}
+
+#menu-lateral.is-open {
+	transform: translateX(0);
+}
+
+/* Estilos para el overlay oscuro de fondo */
+#menu-overlay {
+	background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Estilos para las olas en el encabezado */
+.header-waves {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	z-index: 1;
+}
+
+.wave-line {
+	position: absolute;
+	background-color: var(--button-color);
+	opacity: 0.1;
+	width: 150%;
+	height: 50px;
+}
+
+.wave-line:nth-child(1) {
+	top: -20px;
+	left: -20%;
+	transform: rotate(-3deg);
+	border-radius: 50% 50% 0 0;
+}
+
+.wave-line:nth-child(2) {
+	top: 10px;
+	left: -10%;
+	transform: rotate(2deg);
+	border-radius: 50% 50% 0 0;
+}
+
+/* Estilos del menú de notificaciones */
+.notifications-menu {
+	transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out, transform 0.3s ease-in-out;
+	opacity: 0;
+	visibility: hidden;
+	transform: translateY(10px);
+}
+
+.notifications-menu.is-open {
+	opacity: 1;
+	visibility: visible;
+	transform: translateY(0);
+}
+
+/* Estilos del menú del usuario */
+.user-menu {
+	transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out, transform 0.3s ease-in-out;
+	opacity: 0;
+	visibility: hidden;
+	transform: translateY(10px);
+}
+
+.user-menu.is-open {
+	opacity: 1;
+	visibility: visible;
+	transform: translateY(0);
+}

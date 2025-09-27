@@ -1,0 +1,261 @@
+<div>
+    <h2 class="text-3xl font-bold tracking-tight text-center sm:text-left text-[var(--button-color)]">Agregar Nuevo Producto</h2>
+    <p class="mt-2 text-center sm:text-left text-sm text-[var(--text-secondary)]">Complete el formulario para agregar un nuevo producto al inventario.</p>
+    
+    <form id="product-form" class="bg-white p-6 sm:p-8 rounded-lg shadow-sm mt-6 space-y-6">
+        
+        <div class="space-y-2">
+            <label class="text-sm font-medium leading-none" for="product-name">Nombre del Producto</label>
+            <div class="relative">
+                <input id="product-name" name="name" placeholder="Ej. Limpiador Multiusos Lavanda" type="text" class="form-input flex w-full h-12 rounded-md border border-[var(--border-color)] bg-transparent px-4 py-2 text-sm placeholder:text-[var(--text-secondary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--button-color)]"/>
+                <div class="absolute inset-y-0 right-0 pr-3 flex items-center hidden icon-container"></div>
+            </div>
+            <p class="text-xs text-red-500 hidden helper-text">El nombre es requerido.</p>
+        </div>
+        
+        <div class="space-y-2">
+            <label class="text-sm font-medium leading-none" for="product-description">Descripción</label>
+            <div class="relative">
+                <textarea id="product-description" name="description" placeholder="Añade una descripción breve del producto." class="form-input flex w-full h-24 rounded-md border border-[var(--border-color)] bg-transparent px-4 py-2 text-sm placeholder:text-[var(--text-secondary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--button-color)] resize-none"></textarea>
+                <div class="absolute inset-y-0 right-0 pr-3 flex items-start pt-3 hidden icon-container"></div>
+            </div>
+            <p class="text-xs text-red-500 hidden helper-text">La descripción es requerida.</p>
+        </div>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div class="space-y-2">
+                <label class="text-sm font-medium leading-none" for="product-price">Precio</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-[var(--text-secondary)]">$</span>
+                    <input id="product-price" name="price" placeholder="5.99" step="0.01" type="number" class="form-input pl-7 flex w-full h-12 rounded-md border border-[var(--border-color)] bg-transparent px-4 py-2 text-sm placeholder:text-[var(--text-secondary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--button-color)]"/>
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center hidden icon-container"></div>
+                </div>
+                <p class="text-xs text-red-500 hidden helper-text">El precio debe ser un número positivo.</p>
+            </div>
+            <div class="space-y-2">
+                <label class="text-sm font-medium leading-none" for="quantity">Cantidad</label>
+                <div class="relative">
+                    <input id="quantity" name="quantity" placeholder="100" type="number" class="form-input flex w-full h-12 rounded-md border border-[var(--border-color)] bg-transparent px-4 py-2 text-sm placeholder:text-[var(--text-secondary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--button-color)]"/>
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center hidden icon-container"></div>
+                </div>
+                <p class="text-xs text-red-500 hidden helper-text">La cantidad debe ser un número entero.</p>
+            </div>
+        </div>
+        
+        <div class="space-y-2">
+            <label class="text-sm font-medium leading-none" for="min-stock">Stock Mínimo</label>
+            <div class="relative">
+                <input id="min-stock" name="minimum-stock" placeholder="20" type="number" class="form-input flex w-full h-12 rounded-md border border-[var(--border-color)] bg-transparent px-4 py-2 text-sm placeholder:text-[var(--text-secondary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--button-color)]"/>
+                <div class="absolute inset-y-0 right-0 pr-3 flex items-center hidden icon-container"></div>
+            </div>
+            <p class="text-xs text-red-500 hidden helper-text">El stock mínimo debe ser un número entero.</p>
+        </div>
+        
+        <div class="space-y-2">
+            <label class="text-sm font-medium leading-none" for="product-image">Subir Imagen</label>
+            <div class="relative">
+                <input id="product-image" name="product-image" type="file" accept="image/*" class="form-input flex w-full h-12 rounded-md border border-[var(--border-color)] bg-transparent px-4 py-2 text-sm placeholder:text-[var(--text-secondary)] file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[var(--secondary-color)] file:text-[var(--text-primary)] hover:file:bg-[var(--border-color)]"/>
+                <div class="absolute inset-y-0 right-0 pr-3 flex items-center hidden icon-container"></div>
+            </div>
+            <p class="text-xs text-red-500 hidden helper-text">Una imagen es requerida.</p>
+        </div>
+        
+        <div class="space-y-2">
+            <label class="text-sm font-medium leading-none" for="manufacturer">Fabricante</label>
+            <div class="relative">
+                <input id="manufacturer" name="manufacturer" placeholder="Ej. P&G" type="text" class="form-input flex w-full h-12 rounded-md border border-[var(--border-color)] bg-transparent px-4 py-2 text-sm placeholder:text-[var(--text-secondary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--button-color)]"/>
+                <div class="absolute inset-y-0 right-0 pr-3 flex items-center hidden icon-container"></div>
+            </div>
+            <p class="text-xs text-red-500 hidden helper-text">El fabricante es requerido.</p>
+        </div>
+
+        <p id="status-message" class="text-center"></p>
+        
+        <div class="flex justify-end gap-4">
+            <button class="flex items-center justify-center rounded-md text-sm font-medium transition-colors h-10 px-4 py-2 bg-[var(--secondary-color)] hover:bg-[var(--border-color)] text-[var(--text-primary)]">Cancelar</button>
+            <button id="submit-btn" class="flex items-center justify-center rounded-md text-sm font-medium transition-colors h-10 px-4 py-2 bg-[var(--button-color)] hover:bg-[var(--primary-color)] text-white" type="submit" disabled>Agregar Producto</button>
+        </div>
+    </form>
+</div>
+
+<script>
+// @ts-nocheck
+// Modulos
+import ProductsModule from "./products.module.js";
+import { BACK_ENDPOINT } from "../../config/endpoints.js";
+
+// Selectores
+const inputName = document.querySelector('#product-name');
+const inputDescription = document.querySelector('#product-description');
+const inputPrice = document.querySelector('#product-price');
+const inputQuantity = document.querySelector('#quantity');
+const inputMinimumStock = document.querySelector('#min-stock');
+const inputImage = document.querySelector('#product-image');
+const inputManufacturer = document.querySelector('#manufacturer');
+const form = document.querySelector('#product-form');
+const submitBtn = document.querySelector('#submit-btn');
+const statusMessage = document.querySelector('#status-message'); // Asegúrate de que este elemento exista en tu HTML
+
+// Validaciones del formulario
+let nameValidation = false;
+let descriptionValidation = false;
+let priceValidation = false;
+let quantityValidation = false;
+let minimumStockValidation = false;
+let imageValidation = false;
+let manufacturerValidation = false;
+
+// Funciones
+const renderValidation = (input, validation) => {
+  const helperText = input.parentElement.nextElementSibling;
+  const iconContainer = input.nextElementSibling;
+  
+  if (input.value === '') {
+    input.classList.remove('input-invalid', 'input-valid');
+    helperText?.classList.add('hidden');
+    iconContainer.innerHTML = '';
+    iconContainer.classList.add('hidden');
+  } else if (validation) {
+    input.classList.add('input-valid');
+    input.classList.remove('input-invalid');
+    helperText?.classList.add('hidden');
+    iconContainer.innerHTML = '<span class="iconify" data-icon="mdi:check-circle" style="color: green;"></span>';
+    iconContainer.classList.remove('hidden');
+  } else {
+    input.classList.add('input-invalid');
+    input.classList.remove('input-valid');
+    helperText?.classList.remove('hidden');
+    iconContainer.innerHTML = '<span class="iconify" data-icon="mdi:close-circle" style="color: red;"></span>';
+    iconContainer.classList.remove('hidden');
+  }
+};
+
+const renderButtonState = () => {
+  if (nameValidation && descriptionValidation && priceValidation && quantityValidation && minimumStockValidation && imageValidation && manufacturerValidation) {
+    submitBtn.disabled = false;
+  } else {
+    submitBtn.disabled = true;
+  }
+};
+
+// Eventos
+inputName.addEventListener('input', () => {
+  nameValidation = inputName.value.trim().length > 0;
+  renderValidation(inputName, nameValidation);
+  renderButtonState();
+});
+
+inputDescription.addEventListener('input', () => {
+  descriptionValidation = inputDescription.value.trim().length > 0;
+  renderValidation(inputDescription, descriptionValidation);
+  renderButtonState();
+});
+
+inputPrice.addEventListener('input', () => {
+  const value = parseFloat(inputPrice.value);
+  priceValidation = !isNaN(value) && value > 0;
+  renderValidation(inputPrice, priceValidation);
+  renderButtonState();
+});
+
+inputQuantity.addEventListener('input', () => {
+  const value = parseInt(inputQuantity.value);
+  quantityValidation = !isNaN(value) && value >= 0;
+  renderValidation(inputQuantity, quantityValidation);
+  renderButtonState();
+});
+
+inputMinimumStock.addEventListener('input', () => {
+  const value = parseInt(inputMinimumStock.value);
+  minimumStockValidation = !isNaN(value) && value >= 0;
+  renderValidation(inputMinimumStock, minimumStockValidation);
+  renderButtonState();
+});
+
+// Este es el evento corregido para validar la imagen
+inputImage.addEventListener('change', () => {
+  imageValidation = inputImage.files.length > 0;
+  renderValidation(inputImage, imageValidation);
+  renderButtonState();
+});
+
+inputManufacturer.addEventListener('input', () => {
+  manufacturerValidation = inputManufacturer.value.trim().length > 0;
+  renderValidation(inputManufacturer, manufacturerValidation);
+  renderButtonState();
+});
+
+form.addEventListener('submit', async e => {
+  e.preventDefault();
+
+  // 1. Validar solo los campos que no dependen de la imagen
+  if (!nameValidation || !descriptionValidation || !priceValidation || !quantityValidation || !minimumStockValidation || !imageValidation || !manufacturerValidation) {
+    renderValidation(inputName, nameValidation);
+    renderValidation(inputDescription, descriptionValidation);
+    renderValidation(inputPrice, priceValidation);
+    renderValidation(inputQuantity, quantityValidation);
+    renderValidation(inputMinimumStock, minimumStockValidation);
+    renderValidation(inputManufacturer, manufacturerValidation);
+    renderValidation(inputImage, imageValidation); 
+    return;
+  }
+
+  // 2. Subir la imagen primero
+  statusMessage.textContent = 'Subiendo imagen...';
+  statusMessage.className = 'mt-4 text-center text-sm font-medium text-indigo-600';
+
+  let imageUrl = '';
+  const imageFile = inputImage.files[0];
+  
+  if (imageFile) {
+    // Creamos un nuevo FormData que SÓLO contiene el archivo de la imagen
+    const imageFormData = new FormData();
+    imageFormData.append('product-image', imageFile);
+
+    try {
+      const response = await fetch(`${BACK_ENDPOINT}/api/products/images/upload`, {
+        method: 'POST',
+        body: imageFormData, // Aquí se usa el FormData que solo tiene la imagen
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al subir la imagen.');
+      }
+
+      const data = await response.json();
+      imageUrl = data.imageUrl;
+      statusMessage.textContent = 'Imagen subida. Guardando producto...';
+      statusMessage.className = 'mt-4 text-center text-sm font-medium text-green-600';
+    } catch (error) {
+      statusMessage.textContent = `Error al subir imagen: ${error.message}`;
+      statusMessage.className = 'mt-4 text-center text-sm font-medium text-red-600';
+      console.error('Error al subir la imagen:', error);
+      return;
+    }
+  }
+  
+  // 3. Agregar el producto con la URL de la imagen
+  try {
+    await ProductsModule.addProduct({
+      name: inputName.value.trim(),
+      description: inputDescription.value.trim(),
+      image: imageUrl, // Aquí se usa la URL de la imagen
+      manufacturer: inputManufacturer.value.trim(),
+      quantity: parseInt(inputQuantity.value),
+      minimum_stock: parseInt(inputMinimumStock.value),
+      price: parseFloat(inputPrice.value)
+    });
+
+    statusMessage.textContent = 'Producto guardado con éxito.';
+    statusMessage.className = 'mt-4 text-center text-sm font-medium text-green-600';
+  } catch (error) {
+    statusMessage.textContent = `Error al guardar producto: ${error.message}`;
+    statusMessage.className = 'mt-4 text-center text-sm font-medium text-red-600';
+    console.error('Error al guardar el producto:', error);
+  }
+
+  // 4. Limpiar el formulario
+  form.reset();
+  renderButtonState();
+});
+</script>

@@ -1,0 +1,13 @@
+PUT  http://localhost:3000/api/products/2
+Content-Type: application/json
+{
+    "id": 2,
+    "name": "Cloro",
+    "description": "Cloro",
+    "price": 2.00,
+    "price_bs": 160.00,
+    "quantity": 10,
+    "minimum_stock": 10,
+    "image": "https://example.com/laptop.jpg",
+    "manufacturer": "Stock & Fresh"
+  }

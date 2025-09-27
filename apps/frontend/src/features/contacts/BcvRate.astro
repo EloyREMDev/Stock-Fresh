@@ -1,0 +1,54 @@
+<div class="bg-white p-6 sm:p-8 rounded-lg shadow-sm flex flex-col items-center justify-center text-center">
+        <h3 class="text-2xl font-bold tracking-tight">Tasa de Dólar BCV</h3>
+        
+        <!-- Elementos que se actualizarán dinámicamente -->
+        <div id="dolar-info">
+            <!-- Contenido inicial de carga -->
+            <p class="mt-2 text-sm text-[var(--text-secondary)]">Cargando...</p>
+            <div class="mt-4 text-4xl font-extrabold text-[var(--button-color)]">Bs. ...</div>
+        </div>
+</div>
+
+<script>
+    import { BACK_ENDPOINT } from "../../config/endpoints.js";
+        document.addEventListener('DOMContentLoaded', () => {
+            const dolarInfo = document.getElementById('dolar-info');
+
+            const fetchDolarRate = async () => {
+                try {
+                    const response = await fetch(`${BACK_ENDPOINT}/api/dolar/rate`);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const data = await response.json();
+                    
+                    const formattedDate = data.fechaActualizacion
+                        ? new Date(data.fechaActualizacion).toLocaleDateString('es-ES', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                        })
+                        : 'Sin fecha';
+                    
+                    const formattedRate = data.promedio?.toFixed(2) || 'N/A';
+
+                    dolarInfo.innerHTML = `
+                        <p class="mt-2 text-sm text-[var(--text-secondary)]">
+                            Valor actual al ${formattedDate}.
+                        </p>
+                        <div class="mt-4 text-4xl font-extrabold text-[var(--button-color)]">
+                            Bs. ${formattedRate}
+                        </div>
+                    `;
+                } catch (e) {
+                    console.error("Error al obtener la tasa del dólar:", e);
+                    dolarInfo.innerHTML = `
+                        <p class="mt-2 text-sm text-red-500">Error: No se pudo cargar la tasa.
+                        <br>Asegúrate de que tu servidor backend esté en ejecución.</p>
+                    `;
+                }
+            }
+            
+            fetchDolarRate();
+        });
+</script>

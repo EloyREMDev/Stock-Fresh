@@ -1,0 +1,7 @@
+POST  http://localhost:3000/api/invoice
+Content-Type: application/json
+{
+  "client_name": "Juan Rodriguez",
+  "client_phone_number": "04122334566",
+  "status": "pendiente"
+}

@@ -1,0 +1,1 @@
+import{k as o}from"./index.B9b1t7QR.js";import{B as a}from"./endpoints.QH1VciTq.js";const n=window.location.pathname.split("/verify/")[1],e=document.querySelector("#verify-text");try{const r=await o.patch(`${a}/api/users/verify`,{json:{token:n}}).json();e.innerHTML=r.message}catch(r){const t=await r.response.json();e.innerHTML=t.error}

@@ -1,0 +1,212 @@
+<div class="bg-white p-6 sm:p-8 rounded-lg shadow-sm">
+                            <h3 class="text-xl font-bold tracking-tight text-center">Registrar Fórmulas</h3>
+                            <p class="mt-2 text-sm text-center text-[var(--text-secondary)]">Asigna los insumos y sus cantidades a un producto.</p>
+                            <form id="formula-form" class="mt-6 space-y-6">
+                                <div class="space-y-2">
+                                    <label class="text-sm font-medium leading-none" for="product-select">Producto</label>
+                                    <select id="product-select" class="form-select flex w-full h-12 rounded-md border border-[var(--border-color)] bg-transparent px-4 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--button-color)]">
+                                        <option value="">Selecciona un producto</option>
+                                        <option value="1">Desinfectante de Lavanda</option>
+                                        <option value="2">Cloro</option>
+                                    </select>
+                                </div>
+                                <div id="insumos-container" class="space-y-4">
+                                    <div class="flex items-end gap-4">
+                                        <div class="flex-1 space-y-2">
+                                            <label class="text-sm font-medium leading-none" for="insumo-select-0">Insumo</label>
+                                            <select id="insumo-select-0" class="form-select flex w-full h-12 rounded-md border border-[var(--border-color)] bg-transparent px-4 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--button-color)]">
+                                                <option value="">Selecciona un insumo</option>
+                                                <option value="1">Agua</option>
+                                                <option value="2">Hipoclorito</option>
+                                            </select>
+                                        </div>
+                                        <div class="flex-none w-24 space-y-2">
+                                            <label class="text-sm font-medium leading-none" for="insumo-cantidad-0">Cantidad</label>
+                                            <input id="insumo-cantidad-0" class="form-input flex w-full h-12 rounded-md border border-[var(--border-color)] bg-transparent px-4 py-2 text-sm placeholder:text-[var(--text-secondary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--button-color)]" placeholder="Litros" type="number"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col gap-4">
+                                    <button id="add-insumo-btn" type="button" class="flex items-center justify-center rounded-md text-sm font-medium transition-colors h-10 px-4 py-2 bg-[var(--secondary-color)] hover:bg-[var(--border-color)] text-[var(--text-primary)]">Agregar otro insumo</button>
+                                    <button class="flex items-center justify-center rounded-md text-sm font-medium transition-colors h-10 px-4 py-2 bg-[var(--button-color)] hover:bg-[var(--primary-color)] text-white" type="submit">Registrar Fórmula</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+<script>
+// @ts-nocheck
+import FormulaModule from "./formula.module.js";
+import { BACK_ENDPOINT } from '../../config/endpoints.js';
+
+// Selectores del DOM
+const productSelect = document.getElementById('product-select');
+const supplySelect = document.getElementById('insumo-select-0');
+const addInsumoBtn = document.getElementById('add-insumo-btn');
+const insumosContainer = document.getElementById('insumos-container');
+const formulaForm = document.getElementById('formula-form');
+
+// Función para cargar los productos
+const loadProducts = () => {
+    // Hacemos la llamada 'fetch'
+     fetch(`${BACK_ENDPOINT}/api/products`)
+    .then(response => {
+        // Si la respuesta no es OK, lanzamos un error
+         if (!response.ok) {
+         throw new Error('Error al obtener los productos');
+        }
+        // Convertimos la respuesta a JSON
+        return response.json();
+         })
+         .then(productsFromDatabase => {
+            // ¡Paso CLAVE! El código para llenar el select va aquí adentro.
+            // Esto asegura que solo se ejecute cuando los datos hayan llegado.
+            // Limpia la opción de "Cargando..."
+             productSelect.innerHTML = '<option value="">Selecciona un producto</option>';
+
+                // Recorre cada producto en la lista del servidor
+                 productsFromDatabase.forEach(product => {
+                    const newOption = document.createElement('option');
+                    newOption.value = product.id;
+                    newOption.textContent = product.name;
+                    productSelect.appendChild(newOption);
+                    });
+                })
+                .catch(error => {
+                    // Manejo de errores si la llamada falla
+                    console.error('Error al cargar los productos:', error);
+                    productSelect.innerHTML = '<option value="">Error al cargar los productos</option>';
+                });
+        };
+
+
+
+// Función para cargar los productos
+        const cargarInsumos = () => {
+            // Hacemos la llamada 'fetch'
+            fetch(`${BACK_ENDPOINT}/api/supply`)
+                .then(response => {
+                    // Si la respuesta no es OK, lanzamos un error
+                    if (!response.ok) {
+                        throw new Error('Error al obtener los productos');
+                    }
+                    // Convertimos la respuesta a JSON
+                    return response.json();
+                })
+                .then(productosDelBackend => {
+                    // ¡Paso CLAVE! El código para llenar el select va aquí adentro.
+                    // Esto asegura que solo se ejecute cuando los datos hayan llegado.
+
+                    // Limpia la opción de "Cargando..."
+                    supplySelect.innerHTML = '<option value="">Selecciona un insumo</option>';
+
+                    // Recorre cada producto en la lista del servidor
+                    productosDelBackend.forEach(supply => {
+                        const newOption = document.createElement('option');
+                        newOption.value = supply.id;
+                        newOption.textContent = supply.name;
+                        supplySelect.appendChild(newOption);
+                    });
+                })
+                .catch(error => {
+                    // Manejo de errores si la llamada falla
+                    console.error('Error al cargar los productos:', error);
+                    supplySelect.innerHTML = '<option value="">Error al cargar los insumos</option>';
+                });
+        };
+
+// Llamar ambas funciones para que se ejecute cuando la página esté lista
+window.onload = function() {
+    loadProducts();
+    cargarInsumos();
+};
+
+// Estado del formulario
+let insumoCount = 0;
+
+// Esta función se encarga de obtener los datos y enviarlos al backend.
+const processAndSendFormula = async () => {
+    const productId = productSelect.value;
+    const currentInsumoSelect = document.getElementById(`insumo-select-${insumoCount}`);
+    const currentCantidadInput = document.getElementById(`insumo-cantidad-${insumoCount}`);
+
+    // Validación de los campos
+    if (!productId || productId === "") {
+        alert("Por favor, selecciona un producto.");
+        return false;
+    }
+    const insumoId = currentInsumoSelect.value;
+    const cantidad = parseFloat(currentCantidadInput.value);
+
+    if (!insumoId || insumoId === "" || isNaN(cantidad) || cantidad <= 0) {
+        alert("Por favor, completa el insumo y la cantidad actual.");
+        return false;
+    }
+    
+    // Envío al backend
+    try {
+        await FormulaModule.addFormula({
+            product_id: parseInt(productId),
+            supply_id: parseInt(insumoId),
+            quantity: cantidad
+        });
+        return true; // Éxito
+    } catch (error) {
+        console.error("Error al guardar el insumo:", error);
+        alert("Error al guardar el insumo. Por favor, intenta de nuevo.");
+        return false; // Fallo
+    }
+};
+
+// Genera un nuevo grupo de campos de insumo (select e input)
+const createNewInsumoGroup = () => {
+    insumoCount++; // Incrementa el contador para el nuevo grupo
+    const newInsumoGroup = document.createElement('div');
+    newInsumoGroup.classList.add('flex', 'items-end', 'gap-4', 'insumo-group');
+    newInsumoGroup.innerHTML = `
+        <div class="flex-1 space-y-2">
+            <label class="text-sm font-medium leading-none" for="insumo-select-${insumoCount}">Insumo</label>
+            <select id="insumo-select-${insumoCount}" class="form-select flex w-full h-12 rounded-md border border-[var(--border-color)] bg-transparent px-4 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--button-color)]">
+                <option value="">Selecciona un insumo</option>
+                <option value="1">Agua</option>
+                <option value="2">Hipoclorito</option>
+            </select>
+        </div>
+        <div class="flex-none w-24 space-y-2">
+            <label class="text-sm font-medium leading-none" for="insumo-cantidad-${insumoCount}">Cantidad</label>
+            <input id="insumo-cantidad-${insumoCount}" class="form-input flex w-full h-12 rounded-md border border-[var(--border-color)] bg-transparent px-4 py-2 text-sm placeholder:text-[var(--text-secondary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--button-color)]" placeholder="Litros" type="number"/>
+        </div>
+    `;
+    insumosContainer.appendChild(newInsumoGroup);
+};
+
+// Evento para AGREGAR OTRO INSUMO
+addInsumoBtn.addEventListener('click', async () => {
+    // Procesa y envía los datos del insumo actual
+    const success = await processAndSendFormula();
+
+    // Si el envío fue exitoso, crea el siguiente grupo de campos
+    if (success) {
+        console.log(`Insumo #${insumoCount + 1} guardado con éxito.`);
+        createNewInsumoGroup();
+    }
+});
+
+// Evento para registrar formula (envía el último insumo)
+formulaForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    // Procesa y envía los datos del último insumo
+    const success = await processAndSendFormula();
+
+    if (success) {
+        console.log("Último insumo guardado con éxito. ¡Fórmula completa!");
+        alert("¡Fórmula registrada con éxito!");
+
+        // Limpiar el formulario y resetear el estado
+        formulaForm.reset();
+        insumoCount = 0;
+
+    }
+});
+
+</script>

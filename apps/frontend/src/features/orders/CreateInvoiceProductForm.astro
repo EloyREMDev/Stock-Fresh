@@ -1,0 +1,243 @@
+<body class="bg-gray-50 text-[var(--text-primary)] min-h-screen flex items-center justify-center p-4">
+
+    <main class="w-full max-w-2xl bg-white p-6 sm:p-8 rounded-lg shadow-xl">
+        <h2 class="text-3xl font-bold tracking-tight text-center text-[var(--button-color)] mb-4">Añadir Producto a Factura</h2>
+        <p class="mt-2 text-center text-sm text-[var(--text-secondary)] mb-6">Selecciona un producto y especifica la cantidad para agregarlo a la factura.</p>
+        
+        <form id="invoice-product-form" class="space-y-6">
+
+            <!-- Campo de Número de Factura -->
+            <div class="space-y-2">
+                <label class="text-sm font-medium leading-none" for="invoice-select">Factura</label>
+                <select id="invoice-select" name="client_name" required
+                        class="form-select flex w-full h-12 rounded-md border border-[var(--border-color)] bg-transparent px-4 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--button-color)]">
+                    <option value="">Seleccione su nombre</option>
+                                        <option value="1">Eloy</option>
+                                        <option value="2">Cloro</option>
+                </select>
+
+            <!-- Campo de Cantidad -->
+            <div class="space-y-2">
+                <label class="text-sm font-medium leading-none" for="quantity">Cantidad</label>
+                <input id="quantity" name="quantity" placeholder="100" type="number" min="1" required
+                       class="form-input flex w-full h-12 rounded-md border border-[var(--border-color)] bg-transparent px-4 py-2 text-sm placeholder:text-[var(--text-secondary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--button-color)]"/>
+                <p class="text-xs text-red-500 hidden helper-text">La cantidad debe ser un número entero positivo.</p>
+            </div>
+
+            <div id="status-message" class="text-center text-sm font-medium mt-4"></div>
+
+            <!-- Campo de Producto (Select Dinámico) -->
+            <div class="space-y-2">
+                <label class="text-sm font-medium leading-none" for="product-select">Producto</label>
+                <select id="product-select" name="product_id" required
+                        class="form-select flex w-full h-12 rounded-md border border-[var(--border-color)] bg-transparent px-4 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--button-color)]">
+                    <option value="">Selecciona un producto</option>
+                                        <option value="1">Desinfectante de Lavanda</option>
+                                        <option value="2">Cloro</option>
+                </select>
+
+                 <button type="submit" id="submit-btn" 
+                        class="flex items-center justify-center rounded-md text-sm font-medium transition-colors h-10 px-4 py-2 bg-[var(--button-color)] text-white disabled:opacity-50 disabled:cursor-not-allowed">
+                    <span class="mdi mdi-plus mr-2"></span>
+                    Agregar Producto a Factura
+                </button>
+            
+            
+            
+        
+            </div>
+        </form>
+    </main>
+
+<script>
+// @ts-nocheck
+
+// Modulos
+import InvoiceProductsModule from "./invoiceproduct.module.js";
+import { BACK_ENDPOINT } from '../../config/endpoints.js';
+const productSelect = document.getElementById('product-select');
+const invoiceSelect = document.getElementById('invoice-select');
+
+// Función para cargar los productos
+const loadProducts = () => {
+    // Hacemos la llamada 'fetch'
+     fetch(`${BACK_ENDPOINT}/api/products`)
+    .then(response => {
+        // Si la respuesta no es OK, lanzamos un error
+         if (!response.ok) {
+         throw new Error('Error al obtener los productos');
+        }
+        // Convertimos la respuesta a JSON
+        return response.json();
+         })
+         .then(productsFromDatabase => {
+            // ¡Paso CLAVE! El código para llenar el select va aquí adentro.
+            // Esto asegura que solo se ejecute cuando los datos hayan llegado.
+            // Limpia la opción de "Cargando..."
+             productSelect.innerHTML = '<option value="">Selecciona un producto</option>';
+
+                // Recorre cada producto en la lista del servidor
+                 productsFromDatabase.forEach(product => {
+                    const newOption = document.createElement('option');
+                    newOption.value = product.id;
+                    newOption.textContent = product.name;
+                    productSelect.appendChild(newOption);
+                    });
+                })
+                .catch(error => {
+                    // Manejo de errores si la llamada falla
+                    console.error('Error al cargar los productos:', error);
+                    productSelect.innerHTML = '<option value="">Error al cargar los productos</option>';
+                });
+            };
+
+// Función para cargar los productos
+const loadInvoices = () => {
+    // Hacemos la llamada 'fetch'
+     fetch(`${BACK_ENDPOINT}/api/invoice`)
+    .then(response => {
+        // Si la respuesta no es OK, lanzamos un error
+         if (!response.ok) {
+         throw new Error('Error al obtener las facturas');
+        }
+        // Convertimos la respuesta a JSON
+        return response.json();
+         })
+         .then(invoicesFromDatabase => {
+            // ¡Paso CLAVE! El código para llenar el select va aquí adentro.
+            // Esto asegura que solo se ejecute cuando los datos hayan llegado.
+            // Limpia la opción de "Cargando..."
+             invoiceSelect.innerHTML = '<option value="">Seleccione su nombre</option>';
+
+                // Recorre cada producto en la lista del servidor
+                 invoicesFromDatabase.forEach(invoice => {
+                    const newOption = document.createElement('option');
+                    newOption.value = invoice.id;
+                    newOption.textContent = invoice.client_name;
+                    invoiceSelect.appendChild(newOption);
+                    });
+                })
+                .catch(error => {
+                    // Manejo de errores si la llamada falla
+                    console.error('Error al cargar los productos:', error);
+                    invoiceSelect.innerHTML = '<option value="">Error al cargar las facturas</option>';
+                });
+            }
+ window.onload = function() {
+    loadProducts();
+    loadInvoices();
+};
+ 
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Selectores
+    const inputQuantity = document.querySelector('#quantity');
+    const form = document.querySelector('#invoice-product-form');
+    const submitBtn = document.querySelector('#submit-btn');
+    const statusMessage = document.querySelector('#status-message');
+    
+    // Validaciones del formulario
+    let invoiceIdValidation = false;
+    let productIdValidation = false;
+    let quantityValidation = false;
+
+    // Funciones
+    // ... renderValidation y renderButtonState ...
+    const renderValidation = (input, validation) => {
+        // ... (usa la versión del archivo anterior que usaba nextElementSibling)
+        const helperText = input.parentElement.nextElementSibling;
+        
+        if (input.value === '') {
+            input.classList.remove('input-invalid', 'input-valid');
+            helperText?.classList.add('hidden');
+        } else if (validation) {
+            input.classList.add('input-valid');
+            input.classList.remove('input-invalid');
+            helperText?.classList.add('hidden');
+        } else {
+            input.classList.add('input-invalid');
+            input.classList.remove('input-valid');
+            helperText?.classList.remove('hidden');
+        }
+    };
+
+    const renderButtonState = () => {
+        if (invoiceIdValidation && productIdValidation && quantityValidation) {
+            submitBtn.disabled = false;
+        } else {
+            submitBtn.disabled = true;
+        }
+    };
+    
+    // Eventos
+    invoiceSelect.addEventListener('change', () => {
+        invoiceIdValidation = invoiceSelect.value !== "";
+        renderValidation(invoiceSelect, invoiceIdValidation);
+        renderButtonState();
+    });
+
+    productSelect.addEventListener('change', () => {
+        productIdValidation = productSelect.value !== "";
+        renderValidation(productSelect, productIdValidation);
+        renderButtonState();
+    });
+
+    // 2. **EL EVENTO DEL INPUT DE CANTIDAD DEBE ESTAR AQUÍ**
+    inputQuantity.addEventListener('input', () => { 
+        const value = parseInt(inputQuantity.value);
+        // Usé value >= 1 en la corrección anterior, pero si quieres 0 permitido, déjalo:
+        quantityValidation = !isNaN(value) && value >= 0; 
+        renderValidation(inputQuantity, quantityValidation);
+        renderButtonState();
+    });
+
+    form.addEventListener('submit', async e => {
+        e.preventDefault();
+
+        // Re-validar en el submit
+        invoiceIdValidation = invoiceSelect.value !== "";
+        productIdValidation = productSelect.value !== "";
+        
+        // CORRECCIÓN 3: Revalidar quantityValidation antes del chequeo final
+        const value = parseInt(inputQuantity.value);
+        quantityValidation = !isNaN(value) && value >= 0;
+
+        if (!invoiceIdValidation || !productIdValidation || !quantityValidation) {
+            renderValidation(invoiceSelect, invoiceIdValidation);
+            renderValidation(productSelect, productIdValidation);
+            renderValidation(inputQuantity, quantityValidation);
+            return;
+        }
+        
+        try {
+            // ... (Lógica de envío) ...
+            await InvoiceProductsModule.addInvoiceProduct({
+                invoice_id: parseInt(invoiceSelect.value), 
+                product_id: parseInt(productSelect.value),
+                quantity: parseInt(inputQuantity.value),
+            });
+            console.log("Éxito en el envío (revisa tu módulo para capturar el 400)", { /* response */ });
+
+            statusMessage.textContent = 'Producto agregado con éxito.';
+            statusMessage.className = 'mt-4 text-center text-sm font-medium text-green-600';
+            
+            // Limpieza y reseteo de estados de validación si fue exitoso
+            form.reset();
+            invoiceIdValidation = false;
+            productIdValidation = false;
+            quantityValidation = false;
+            [invoiceSelect, productSelect, inputQuantity].forEach(el => el.classList.remove('input-valid', 'input-invalid'));
+
+
+        } catch (error) {
+            statusMessage.textContent = `Error al guardar producto: ${error.message}`;
+            statusMessage.className = 'mt-4 text-center text-sm font-medium text-red-600';
+            console.error('Error al agregar el producto:', error);
+        }
+
+        renderButtonState();
+    });
+
+}); 
+</script>

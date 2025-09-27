@@ -1,0 +1,8 @@
+POST  http://localhost:3000/api/invoiceProducts
+Content-Type: application/json
+{
+  "product_id": 1,
+  "invoice_id": 3,
+  "quantity": 2
+  
+}

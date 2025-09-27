@@ -1,0 +1,9 @@
+PUT  http://localhost:3000/api/supply/3
+Content-Type: application/json
+{
+  "id": 3,
+  "name": "Agua",
+  "quantity": 10,
+  "minimum_stock": 6,
+  "supplier": "Agua"
+}

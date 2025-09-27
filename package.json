@@ -1,0 +1,17 @@
+{
+  "name": "contacto-fullstack-lunes",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm run start --workspace=server",
+    "client:dev": "npm run dev --workspace=client",
+    "server:dev": "npm run dev --workspace=server",
+    "server:prod": "npm run prod --workspace=server",
+    "build:client": "rm -rf apps/backend/dist && npm run build --workspace=client && cp -r apps/frontend/dist/ apps/backend/dist"
+  },
+  "workspaces":["apps/*"],
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

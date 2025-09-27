@@ -1,0 +1,277 @@
+ <main class="w-full max-w-2xl bg-white p-6 sm:p-8 rounded-lg shadow-xl">
+        <h2 class="text-3xl font-bold tracking-tight text-center text-[var(--button-color)] mb-4">Actualizar Factura</h2>
+        <p class="mt-2 text-center text-sm text-[var(--text-secondary)] mb-6">Selecciona una factura para actualizar su número de teléfono y estado.</p>
+        
+        <form id="invoice-product-form" class="space-y-6">
+
+            <!-- Campo de Número de Factura -->
+            <div class="space-y-2">
+                <label class="text-sm font-medium leading-none" for="invoice-select">Factura</label>
+                <select id="invoice-select" name="invoice_id" required
+                        class="form-select flex w-full h-12 rounded-md border border-[var(--border-color)] bg-transparent px-4 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--button-color)]">
+                    <!-- Opción de carga inicial -->
+                    <option value="">Cargando facturas...</option>
+                </select>
+                <p class="text-xs text-red-500 hidden helper-text-invoice">Selecciona una factura válida.</p>
+            </div>
+
+            <!-- Campo de Teléfono -->
+            <div class="space-y-2">
+                <label class="text-sm font-medium leading-none" for="phone-number-input">Número de telefono</label>
+                <input id="phone-number-input" name="client_phone_number" type="tel" placeholder="Número de teléfono (11 dígitos)" required
+                        class="form-input flex w-full h-12 rounded-md border border-[var(--border-color)] bg-transparent px-4 py-2 text-sm placeholder:text-[var(--text-secondary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--button-color)]"/>
+                <p class="text-xs text-red-500 hidden helper-text-phone">Debe ser un número de teléfono válido (11 dígitos).</p> 
+            </div>
+
+            <div id="status-message" class="text-center text-sm font-medium mt-4"></div>
+
+            <!-- Campo de Estado (editable) -->
+            <div class="space-y-2">
+                <label class="text-sm font-medium leading-none" for="invoice-status">Estado</label>
+                <select id="invoice-status" name="status" 
+                        class="form-select flex w-full h-12 rounded-md border border-[var(--border-color)] bg-white px-4 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--button-color)]">
+                    <option value="pendiente">Pendiente</option>
+                    <option value="confirmado">Confirmado</option>
+                </select>
+                <p class="text-xs text-red-500 hidden helper-text-status">Selecciona un estado.</p>
+            </div>
+            
+            <!-- Botón de Submit -->
+            <button type="submit" id="submit-btn" disabled 
+                    class="flex items-center justify-center rounded-md text-sm font-medium transition-colors h-10 px-4 py-2 bg-[var(--button-color)] text-white disabled:opacity-50 disabled:cursor-not-allowed">
+                <span class="mdi mdi-update mr-2"></span>
+                Actualizar Factura
+            </button>
+
+        </form>
+    </main>
+
+
+
+<script>
+// @ts-nocheck
+
+// Modulos
+import InvoiceProductsModule from "./invoiceproduct.module.js";
+import { BACK_ENDPOINT } from '../../config/endpoints.js';
+
+
+
+// Selectores globales
+const invoiceSelect = document.getElementById('invoice-select');
+const phoneInput = document.getElementById('phone-number-input'); 
+const statusSelect = document.getElementById('invoice-status'); 
+const submitBtn = document.getElementById('submit-btn');
+
+
+// Módulo de Facturas (Contiene la lógica de comunicación con el backend)
+const InvoiceModule = {
+    // Función para obtener las facturas desde el backend
+    loadInvoices: async () => {
+        const url = `${BACK_ENDPOINT}/api/invoice`;
+        console.log(`[REQUEST GET] Obteniendo facturas de: ${url}`);
+        
+        try {
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+                // Si la respuesta no es OK, lanza un error con el estado HTTP
+                throw new Error(`Error HTTP ${response.status}: Error al obtener las facturas`);
+            }
+            // Devuelve los datos en formato JSON
+            return response.json();
+            
+        } catch (error) {
+            console.error("Error en la solicitud GET:", error);
+            throw error; // Propaga el error para que populateInvoices lo maneje
+        }
+    },
+
+    // Función para realizar la solicitud PUT a /api/invoice/:id
+    updateInvoice: async (invoiceId, data) => {
+        const url = `${BACK_ENDPOINT}/api/invoice/${invoiceId}`;
+        
+        try {
+            console.log(`[REQUEST PUT] Enviando a: ${url}`);
+            console.log(`[REQUEST PUT] Datos del Body:`, data);
+            
+            const response = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (!response.ok) {
+                let errorMessage = `Error HTTP: ${response.status} al actualizar.`;
+                try {
+                    const errorData = await response.json();
+                    errorMessage = errorData.message || errorMessage;
+                } catch (e) {}
+                throw new Error(errorMessage);
+            }
+
+            return response.json();
+            
+        } catch (error) {
+            console.error("Error en la solicitud PUT:", error);
+            throw error;
+        }
+    }
+};
+
+
+// Función para cargar y poblar las facturas en el select
+const populateInvoices = () => {
+    // 1. Mostrar estado de carga inicial
+    invoiceSelect.innerHTML = '<option value="">Cargando facturas...</option>';
+    
+    // 2. Llamar a la función de carga
+    InvoiceModule.loadInvoices()
+        .then(invoicesFromDatabase => {
+            // 3. Limpiar y añadir la opción por defecto
+            invoiceSelect.innerHTML = '<option value="">Seleccione Factura</option>';
+
+            // 4. Recorrer los resultados y crear las opciones
+            invoicesFromDatabase.forEach(invoice => {
+                const newOption = document.createElement('option');
+                newOption.value = invoice.id;
+                newOption.textContent = `${invoice.client_name} (ID: ${invoice.id})`;
+                // Guardamos el nombre del cliente en un data-attribute para el payload PUT
+                newOption.setAttribute('data-client-name', invoice.client_name); 
+                invoiceSelect.appendChild(newOption);
+            });
+        })
+        .catch(error => {
+            // 5. Manejo de error si la carga falla
+            console.error('Error al cargar las facturas:', error);
+            invoiceSelect.innerHTML = '<option value="">Error al cargar las facturas</option>';
+        });
+}
+
+// Iniciar la carga de facturas al cargar la ventana
+window.onload = function() {
+    populateInvoices();
+};
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.querySelector('#invoice-product-form');
+    const statusMessage = document.querySelector('#status-message');
+    
+    // Estado de validación
+    let invoiceIdValidation = false;
+    let phoneValidation = false; 
+    let statusValidation = true; 
+
+    // RegExp para 11 dígitos
+    const phoneRegex = /^\d{11}$/; 
+
+    // Función para renderizar el estado visual de la validación
+    const renderValidation = (input, validation, helperClassName) => {
+        const helperText = document.querySelector(helperClassName);
+        
+        if (input.value === '') {
+            input.classList.remove('input-invalid', 'input-valid');
+            if (helperText) helperText.classList.add('hidden');
+        } else if (validation) {
+            input.classList.add('input-valid');
+            input.classList.remove('input-invalid');
+            if (helperText) helperText.classList.add('hidden');
+        } else {
+            input.classList.add('input-invalid');
+            input.classList.remove('input-valid');
+            if (helperText) helperText.classList.remove('hidden');
+        }
+    };
+
+    // Función para actualizar el estado del botón
+    const renderButtonState = () => {
+        if (invoiceIdValidation && phoneValidation && statusValidation) {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('disabled:opacity-50');
+        } else {
+            submitBtn.disabled = true;
+            submitBtn.classList.add('disabled:opacity-50');
+        }
+    };
+    
+    // --- Eventos ---
+    
+    // 1. Factura Select: Valida la selección y habilita/deshabilita otros campos si es necesario.
+    invoiceSelect.addEventListener('change', () => {
+        invoiceIdValidation = invoiceSelect.value !== "";
+        renderValidation(invoiceSelect, invoiceIdValidation, '.helper-text-invoice');
+        renderButtonState();
+    });
+
+    // 2. Teléfono Input: Valida el formato del teléfono.
+    phoneInput.addEventListener('input', () => {
+        phoneValidation = phoneInput.value !== "" && phoneRegex.test(phoneInput.value);
+        renderValidation(phoneInput, phoneValidation, '.helper-text-phone');
+        renderButtonState();
+    });
+
+    // 3. Estado Select: Valida que haya una selección de estado (aunque siempre la habrá si hay opciones).
+    statusSelect.addEventListener('change', () => {
+        statusValidation = statusSelect.value !== "";
+        renderValidation(statusSelect, statusValidation, '.helper-text-status');
+        renderButtonState();
+    });
+
+    // Evento de Submit del Formulario
+    form.addEventListener('submit', async e => {
+        e.preventDefault();
+
+        // Re-validar en el submit
+        invoiceIdValidation = invoiceSelect.value !== "";
+        phoneValidation = phoneInput.value !== "" && phoneRegex.test(phoneInput.value);
+        statusValidation = statusSelect.value !== "";
+        
+        if (!invoiceIdValidation || !phoneValidation || !statusValidation) {
+            statusMessage.textContent = 'Por favor, completa todos los campos requeridos.';
+            statusMessage.className = 'mt-4 text-center text-sm font-medium text-red-600';
+            return;
+        }
+        
+        try {
+            submitBtn.textContent = 'Actualizando...';
+            submitBtn.disabled = true;
+            
+            const invoiceId = parseInt(invoiceSelect.value);
+            // Obtiene el nombre del cliente del data-attribute de la opción seleccionada
+            const selectedOption = invoiceSelect.options[invoiceSelect.selectedIndex];
+            const clientName = selectedOption.getAttribute('data-client-name');
+
+
+            // Construcción del Payload PUT
+            const updatePayload = {
+                client_name: clientName, 
+                client_phone_number: phoneInput.value,
+                status: statusSelect.value, 
+            };
+
+            // Llamada al backend
+            await InvoiceModule.updateInvoice(invoiceId, updatePayload);
+
+            submitBtn.textContent = 'Actualizar Factura';
+            submitBtn.disabled = false;
+            
+            statusMessage.textContent = `Factura ID ${invoiceId} de ${clientName} actualizada con éxito.`;
+            statusMessage.className = 'mt-4 text-center text-sm font-medium text-green-600';
+            
+        } catch (error) {
+            submitBtn.textContent = 'Actualizar Factura';
+            submitBtn.disabled = false;
+            
+            statusMessage.textContent = `Error al actualizar: ${error.message}`;
+            statusMessage.className = 'mt-4 text-center text-sm font-medium text-red-600';
+            console.error('Error al actualizar la factura:', error);
+        } finally {
+            renderButtonState(); 
+        }
+    });
+
+}); 
+</script>

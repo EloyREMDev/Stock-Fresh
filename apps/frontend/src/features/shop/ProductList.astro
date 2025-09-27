@@ -1,0 +1,41 @@
+---
+import ProductsModule from './products.module.js';
+import ProductItem from './ProductItem.astro';
+// Importa el nuevo componente de tarjeta de producto
+
+
+let products = [];
+try {
+  products = await ProductsModule.getProducts();
+} catch (error) {
+  console.error("Error al cargar los productos:", error);
+}
+---
+<main class="flex flex-1 justify-center py-8 px-4 sm:px-6 lg:px-8">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@6.5.95/css/materialdesignicons.min.css">
+  <div id="shop-content" class="w-full max-w-6xl">
+    <h2 class="text-3xl font-bold tracking-tight text-center text-[var(--button-color)] mb-8">Nuestros Productos</h2>
+    <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      {
+        // Usa `map` para pasar los datos de cada producto como props a cada `ProductCard`.
+        products.map(product => (
+          <ProductItem
+            name={product.name}
+            description={product.description}
+            price={product.price}
+            price_bs={product.price_bs}
+            image={product.image}
+          />
+        ))
+      }
+    </div>
+    {
+      products.length === 0 && (
+        <div id="no-products-message" class="flex flex-col items-center justify-center py-20 text-center">
+          <span class="mdi mdi-package-variant-off text-6xl text-[var(--text-secondary)] mb-4"></span>
+          <p class="text-2xl font-semibold text-[var(--text-secondary)]">¡No hay productos por ahora, vuelva más tarde!</p>
+        </div>
+      )
+    }
+  </div>
+</main>

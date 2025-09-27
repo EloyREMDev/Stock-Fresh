@@ -1,0 +1,8 @@
+PUT  http://localhost:3000/api/formula/3
+Content-Type: application/json
+  {
+    "id": 3,
+    "product_id": 2,
+    "supply_id": 2,
+    "quantity": 1
+  }

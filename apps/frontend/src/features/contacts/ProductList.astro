@@ -1,0 +1,114 @@
+---
+import ProductItem from "./ProductItem.astro";
+import ProductsModule, { products } from "./products.module.js";
+---
+
+<div class="mt-8">
+  <h2 class="text-3xl font-bold tracking-tight text-center sm:text-left text-[var(--button-color)]">
+    Lista de Productos
+  </h2>
+  <ul id="products-list" class="space-y-4 mt-6"></ul>
+  <template id="product-item-template">
+    <ProductItem />
+  </template>
+</div>
+
+
+<script>
+// @ts-nocheck
+import ProductsModule from "./products.module.js";
+import { products, dolarRate } from "./products.module.js";
+
+document.addEventListener("DOMContentLoaded", async () => {
+    const productList = document.getElementById("products-list");
+    const template = document.getElementById("product-item-template") as HTMLTemplateElement;
+
+    if (!productList || !template) {
+        console.error("No se encontró el contenedor de la lista o la plantilla.");
+        return;
+    }
+
+    // Para el valor del dolar
+    await ProductsModule.getDolarRate();
+    const currentDolarRate = dolarRate.get();
+
+    // Función para renderizar la lista de productos
+    const renderProducts = (productsData: any[]) => {
+        productList.innerHTML = '';
+        
+        if (productsData.length === 0) {
+            const noProductsMessage = document.createElement("p");
+            noProductsMessage.textContent = "No hay productos disponibles.";
+            noProductsMessage.className = "text-center text-lg text-gray-500";
+            productList.appendChild(noProductsMessage);
+            return;
+        }
+        
+        productsData.forEach(product => {
+            const itemNode = template.content.cloneNode(true);
+            const listItem = (itemNode as DocumentFragment).querySelector("li");
+            
+            if (!listItem) return;
+
+            listItem.dataset.productId = product.id;
+
+            const nameInput = (listItem.querySelector(".product-name-input") as HTMLInputElement);
+            const descriptionInput = (listItem.querySelector(".product-description-input") as HTMLInputElement);
+            const priceInput = (listItem.querySelector(".product-price-input") as HTMLInputElement);
+            const priceBsInput = (listItem.querySelector(".product-price-bs-input") as HTMLInputElement);
+            const quantityInput = (listItem.querySelector(".product-quantity-input") as HTMLInputElement);
+            const minStockInput = (listItem.querySelector(".product-min-stock-input") as HTMLInputElement);
+            const manufacturerInput = (listItem.querySelector(".product-manufacturer-input") as HTMLInputElement);
+
+            // Rellenar los inputs con los datos del producto
+            nameInput.value = product.name;
+            descriptionInput.value = product.description;
+            priceInput.value = product.price.toFixed(2);
+            priceBsInput.value = (product.price * currentDolarRate).toFixed(2);
+            quantityInput.value = String(product.quantity);
+            minStockInput.value = String(product.minimum_stock);
+            manufacturerInput.value = product.manufacturer;
+            
+            // AÑADIR EL LISTENER DENTRO DEL BUCLE
+            priceInput.addEventListener("input", (event) => {
+                const priceUSD = parseFloat(priceInput.value);
+                if (!isNaN(priceUSD)) {
+                    priceBsInput.value = (priceUSD * currentDolarRate).toFixed(2);
+                } else {
+                    priceBsInput.value = '';
+                }
+            });
+
+            productList.appendChild(listItem);
+        });
+    };
+
+    // 1. Nos suscribimos a los cambios
+    products.listen(productsData => {
+        renderProducts(productsData);
+    });
+    
+    // 2. Obtenemos los productos de la API y renderizamos la lista por primera vez
+    await ProductsModule.getProducts();
+
+    // 3. Lógica de eventos para los botones
+    productList.addEventListener("click", async (event) => {
+        const target = event.target as HTMLElement;
+        const listItem = target.closest("li");
+        
+        if (!listItem) return;
+
+        const productId = listItem.dataset.productId;
+        
+        if (target.closest(".delete-btn")) {
+            if (confirm("¿Estás seguro de que quieres eliminar este producto?")) {
+                await ProductsModule.removeProduct(productId);
+            }
+        }
+        
+        if (target.closest(".edit-btn")) {
+            console.log(`Editar producto con ID: ${productId}`);
+        }
+    });
+});
+</script>

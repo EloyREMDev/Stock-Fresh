@@ -1,0 +1,13 @@
+POST  http://localhost:3000/api/products
+Content-Type: application/json
+{
+  "id": 1,
+  "name": "Cloro",
+  "description": "Cloro",
+  "price": 1.20,
+  "price_bs": 160,
+  "quantity": 20,
+  "minimum_stock": 10,
+  "image": "https://example.com/laptop.jpg",
+  "manufacturer": "Fresh & Clean"
+}

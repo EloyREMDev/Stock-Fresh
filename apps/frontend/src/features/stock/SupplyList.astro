@@ -1,0 +1,94 @@
+---
+import SupplyItem from "./SupplyItem.astro";
+import SupplyModule, { supply } from "./supply.module.js";
+---
+
+<div class="mt-8">
+  <h2 class="text-3xl font-bold tracking-tight text-center sm:text-left text-[var(--button-color)]">
+    Lista de Insumos
+  </h2>
+  <ul id="supply-list" class="space-y-4 mt-6"></ul>
+  <template id="supply-item-template">
+    <SupplyItem />
+  </template>
+</div>
+
+
+<script>
+// @ts-nocheck
+import SupplyModule from "./supply.module.js";
+import { supply } from "./supply.module.js";
+
+document.addEventListener("DOMContentLoaded", async () => {
+    const supplyList = document.getElementById("supply-list");
+    const template = document.getElementById("supply-item-template") as HTMLTemplateElement;
+
+    if (!supplyList || !template) {
+        console.error("No se encontró el contenedor de la lista o la plantilla.");
+        return;
+    }
+
+    // Función para renderizar la lista de insumos
+    const renderSupply = (supplyData: any[]) => {
+        supplyList.innerHTML = '';
+        
+        if (supplyData.length === 0) {
+            const noSupplyMessage = document.createElement("p");
+            noSupplyMessage.textContent = "No hay insumos disponibles.";
+            noSupplyMessage.className = "text-center text-lg text-gray-500";
+            supplyList.appendChild(noSupplyMessage);
+            return;
+        }
+        
+        supplyData.forEach(supply => {
+            const itemNode = template.content.cloneNode(true);
+            const listItem = (itemNode as DocumentFragment).querySelector("li");
+            
+            if (!listItem) return;
+
+            listItem.dataset.supplyId = supply.id;
+
+            const nameInput = (listItem.querySelector(".supply-name-input") as HTMLInputElement);
+            const quantityInput = (listItem.querySelector(".supply-quantity-input") as HTMLInputElement);
+            const minStockInput = (listItem.querySelector(".supply-min-stock-input") as HTMLInputElement);
+            const supplierInput = (listItem.querySelector(".supply-supplier-input") as HTMLInputElement);
+
+            // Rellenar los inputs con los datos del insumo
+            nameInput.value = supply.name;
+            quantityInput.value = String(supply.quantity);
+            minStockInput.value = String(supply.minimum_stock);
+            supplierInput.value = supply.supplier;
+            supplyList.appendChild(listItem);
+        });
+    };
+
+    // 1. Nos suscribimos a los cambios
+    supply.listen(supplyData => {
+        renderSupply(supplyData);
+    });
+    
+    // 2. Obtenemos los insumos de la API y renderizamos la lista por primera vez
+    await SupplyModule.getSupply();
+
+    // 3. Lógica de eventos para los botones
+    supplyList.addEventListener("click", async (event) => {
+        const target = event.target as HTMLElement;
+        const listItem = target.closest("li");
+        
+        if (!listItem) return;
+
+        const supplyId = listItem.dataset.supplyId;
+        
+        if (target.closest(".delete-btn")) {
+            if (confirm("¿Estás seguro de que quieres eliminar este insumo?")) {
+                await SupplyModule.removeSupply(supplyId);
+            }
+        }
+        
+        if (target.closest(".edit-btn")) {
+            console.log(`Editar insumo con ID: ${supplyId}`);
+        }
+    });
+});
+</script>
+
